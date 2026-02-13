@@ -68,7 +68,13 @@ router.post('/signin', async function(req, res, next) {
     if (existingUser) {
       var compareResult = await bcrypt.compareSync(password, existingUser.password);
       if (compareResult) {
-        res.status(200).json({ message: 'Login successful.', user: existingUser });
+        // 세션에 사용자 정보 저장
+        req.session.isAuthenticated = true;
+        req.session.userId = existingUser._id.toString();
+        req.session.username = existingUser.username;
+        req.session.nickname = existingUser.nickname;
+
+        res.status(200).json({ message: 'Login successful.' });
       } else {
         res.status(401).json({ message: 'Invalid password.' });
       }
