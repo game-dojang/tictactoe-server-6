@@ -86,4 +86,20 @@ router.post('/signin', async function(req, res, next) {
   }
 });
 
+// 로그아웃
+router.get('/signout', function(req, res, next) {
+  if (req.session) {
+    // 세션 삭제
+    req.session.destroy(function(err) {
+      if (err) {
+        return res.status(500).json({ message: 'Internal server error.' });
+      } else {
+        return res.status(200).json({ message: 'Logout successful.' });
+      }
+    });
+  } else {
+    res.status(400).json({ message: 'No active session.' });
+  }
+});
+
 module.exports = router;
