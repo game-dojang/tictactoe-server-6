@@ -11,20 +11,26 @@ module.exports = function(server) {
     var socketRooms = new Map();
 
     io.on('connection', function(socket) {
-        console.log('a user connected');
+        console.log('Connected: ' + socket.id);
 
         if (rooms.length > 0) {
             var roomId = rooms.shift();
             socket.join(roomId);
             socket.emit('joinRoom', { roomId: roomId });
-            socket.to(roomId).emit('startGame', { socketId: roomId });
+            socket.to(roomId).emit('startGame', { roomId: roomId });
             socketRooms.set(socket.id, roomId);
+
+            // 테스트
+            console.log('Joined existing room: ' + roomId);
         } else {
             var roomId = uuidv4();
             socket.join(roomId);
             socket.emit('createRoom', { roomId: roomId });
             rooms.push(roomId);
             socketRooms.set(socket.id, roomId);
+
+            // 테스트
+            console.log('Created new room: ' + roomId);
         }
 
         socket.on('leaveRoom', function(data) {
@@ -44,7 +50,7 @@ module.exports = function(server) {
             socketRooms.delete(socket.id);
         });
 
-        socket.on('disconnecting', function() {
+        socket.on('disconnecting', function(reason) {
             console.log('Disconnected: ' + socket.id + ', Reason: ' + reason);
         });
 
